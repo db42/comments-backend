@@ -4,6 +4,14 @@ const request = require('request');
 const app = express()
 
 const apiKey = '*****************';
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./commentbackend-firebase-adminsdk-hd4rr-a809e69fd1.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://commentbackend.firebaseio.com"
+});
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
