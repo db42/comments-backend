@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
-const app = express()
+const app = express();
+const mongoClient = require('./mongoClient');
 
 const apiKey = '*****************';
 var admin = require("firebase-admin");
@@ -25,31 +26,31 @@ app.get('/comments', function (req, res) {
 })
 
 const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj'}];
-const notificationsDict = {'demo_user_id': 'demo token';}
+const notificationsDict = {'demo_user_id': 'demo token'};
 //Fetch all the comments
-app.get('/comments', function (req, res) {
-  res.json(comments);
+app.get('/comments/:id', function (req, res) {
+  console.log(req.params.id);
+  mongoClient.getComments(req.params.id, (comments) => {
+    res.json(comments);
+  })
   // res.render('index', {weather: null, error: null});
 })
 
 //Post comment
-app.post('/comments', function (req, res)
-{
+app.post('/comments', function (req, res) {
   let newComment = {
-    'object_id': req.body.object_id,
-    'object_creator_guid':req.body.object_creator_guid,
+    'metadataId': req.body.object_id,
+    'ownerId':req.body.object_creator_guid,
     'text': req.body.text,
-    'sender_guid': req.body.sender_guid,
-    'sender_name':req.body.sender_name,
-    'comment_timeStamp': req.body.comment_timeStamp,
-    'tagged_guids':req.body.shreya.raj,
+    'senderId': req.body.sender_guid,
+    'senderName':req.body.sender_name,
+    'taggedIds':req.body.shreya.raj,
   };
-  console.log(req.body);
-  //TODO save in database
-  comments.push(newComment);
 
-  res.sendStatus(200);
-}
+  mongoClient.insertComment(newComment, () => {
+    res.send('success');
+  });
+})
 
 
   app.post('/register_token', function(req, res) {
@@ -58,7 +59,6 @@ app.post('/comments', function (req, res)
 
     notificationsDict[user_guid] = device_token;
     res.sendStatus(200);
-}
 
 
 
