@@ -19,14 +19,14 @@ app.get('/comments', function (req, res) {
 const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj'}];
 const notificationsDict = {'demo_user_id': 'demo token';}
 //Fetch all the comments
-app.get('/comments', function (req, res) {
+app.get('/comments/:object_id', function (req, res) {
+  var object_id= req.params.object_id;
   res.json(comments);
   // res.render('index', {weather: null, error: null});
 })
 
 //Post comment
-app.post('/comments', function (req, res)
-{
+app.post('/comments', function (req, res) {
   let newComment = {
     'object_id': req.body.object_id,
     'object_creator_guid':req.body.object_creator_guid,
@@ -41,7 +41,7 @@ app.post('/comments', function (req, res)
   comments.push(newComment);
 
   res.sendStatus(200);
-}
+})
 
 
   app.post('/register_token', function(req, res) {
@@ -50,7 +50,6 @@ app.post('/comments', function (req, res)
 
     notificationsDict[user_guid] = device_token;
     res.sendStatus(200);
-}
 
 
 
