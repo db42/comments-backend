@@ -21,12 +21,13 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs')
 
 app.get('/comments', function (req, res) {
-  res.json({"foo": "bar"});
+  // sendTestMessage();
+  res.json({ "foo": "bar" });
   // res.render('index', {weather: null, error: null});
 })
 
-const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj'}];
-const notificationsDict = {'demo_user_id': 'demo token'};
+const comments = [{ 'object_id': '41004', 'text': 'hello world', 'sender_guid': 'shreya.raj', 'sender_name': 'Shreya', 'comment_timeStamp': '1:12pm', 'tagged_guids': 'shreya.raj' }];
+const notificationsDict = { 'demo_user_id': 'demo token' };
 //Fetch all the comments
 app.get('/comments/:id', function (req, res) {
   console.log(req.params.id);
@@ -40,11 +41,11 @@ app.get('/comments/:id', function (req, res) {
 app.post('/comments', function (req, res) {
   let newComment = {
     'metadataId': req.body.object_id,
-    'ownerId':req.body.object_creator_guid,
+    'ownerId': req.body.object_creator_guid,
     'text': req.body.text,
     'senderId': req.body.sender_guid,
-    'senderName':req.body.sender_name,
-    'taggedIds':req.body.shreya.raj,
+    'senderName': req.body.sender_name,
+    'taggedIds': req.body.shreya.raj,
   };
 
   mongoClient.insertComment(newComment, () => {
@@ -53,12 +54,12 @@ app.post('/comments', function (req, res) {
 })
 
 
-  app.post('/register_token', function(req, res) {
-    let user_guid = req.body.user_guid;
-    let device_token = req.body.device_token;
+app.post('/register_token', function (req, res) {
+  let user_guid = req.body.user_guid;
+  let device_token = req.body.device_token;
 
-    notificationsDict[user_guid] = device_token;
-    res.sendStatus(200);
+  notificationsDict[user_guid] = device_token;
+  res.sendStatus(200);
 
 
 
@@ -78,6 +79,31 @@ app.post('/comments', function (req, res) {
   //   }
   // });
 })
+
+
+function sendTestMessage() {
+  var payload = {
+    notification: {
+      title: "This is a Notification",
+      body: "This is the body of the notification message."
+    }
+  };
+
+  var options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24
+  };
+
+  const deviceToken = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n";
+
+  admin.messaging().sendToDevice(deviceToken, payload, options)
+    .then(function (response) {
+      console.log("Successfully sent message:", response);
+    })
+    .catch(function (error) {
+      console.log("Error sending message:", error);
+    });
+}
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
