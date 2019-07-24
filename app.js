@@ -16,8 +16,8 @@ app.get('/comments', function (req, res) {
   // res.render('index', {weather: null, error: null});
 })
 
-const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj';}];
-
+const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj'}];
+const notificationsDict = {'demo_user_id': 'demo token';}
 //Fetch all the comments
 app.get('/comments', function (req, res) {
   res.json(comments);
@@ -25,24 +25,34 @@ app.get('/comments', function (req, res) {
 })
 
 //Post comment
-app.post('/comments', function (req, res) {
+app.post('/comments', function (req, res)
+{
   let newComment = {
     'object_id': req.body.object_id,
+    'object_creator_guid':req.body.object_creator_guid,
     'text': req.body.text,
     'sender_guid': req.body.sender_guid,
     'sender_name':req.body.sender_name,
     'comment_timeStamp': req.body.comment_timeStamp,
     'tagged_guids':req.body.shreya.raj,
-
-
   };
   console.log(req.body);
-  
-
   //TODO save in database
   comments.push(newComment);
 
   res.sendStatus(200);
+}
+
+
+  app.post('/register_token', function(req, res) {
+    let user_guid = req.body.user_guid;
+    let device_token = req.body.device_token;
+
+    notificationsDict[user_guid] = device_token;
+    res.sendStatus(200);
+}
+
+
 
   // let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
 
