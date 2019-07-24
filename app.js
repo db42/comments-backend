@@ -17,7 +17,7 @@ app.get('/comments', function (req, res) {
 })
 
 const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj'}];
-const notificationsDict = {'demo_user_id': 'demo token';}
+const notificationsDict = {'demo_user_id': 'demo token'};
 //Fetch all the comments
 app.get('/comments/:object_id', function (req, res) {
   var object_id= req.params.object_id;
@@ -37,6 +37,7 @@ app.post('/comments', function (req, res) {
     'tagged_guids':req.body.shreya.raj,
   };
   console.log(req.body);
+
   //TODO save in database
   comments.push(newComment);
 
