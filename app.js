@@ -7,14 +7,16 @@ const apiKey = '*****************';
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 app.set('view engine', 'ejs')
 
-app.get('/', function (req, res) {
+app.get('/comments', function (req, res) {
   res.json({"foo": "bar"});
   // res.render('index', {weather: null, error: null});
 })
 
-const comments = [{'object_id': '34343434', 'text': 'hello world'}];
+const comments = [{'object_id': '41004', 'text': 'hello world', 'sender_guid':'shreya.raj', 'sender_name':'Shreya', 'comment_timeStamp':'1:12pm', 'tagged_guids':'shreya.raj';}];
 
 //Fetch all the comments
 app.get('/comments', function (req, res) {
@@ -25,14 +27,22 @@ app.get('/comments', function (req, res) {
 //Post comment
 app.post('/comments', function (req, res) {
   let newComment = {
-    object_id: req.body.object_id,
-    text: req.body.text,
-  }
+    'object_id': req.body.object_id,
+    'text': req.body.text,
+    'sender_guid': req.body.sender_guid,
+    'sender_name':req.body.sender_name,
+    'comment_timeStamp': req.body.comment_timeStamp,
+    'tagged_guids':req.body.shreya.raj,
+
+
+  };
+  console.log(req.body);
+  
 
   //TODO save in database
   comments.push(newComment);
 
-
+  res.sendStatus(200);
 
   // let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
 
