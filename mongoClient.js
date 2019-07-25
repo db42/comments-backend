@@ -5,16 +5,17 @@ const url = 'mongodb://localhost:27017';
 
 // Database Name
 const dbName = 'objectComments';
-const collectionName = 'comments';
+const commentCollection = 'comments';
+const userCollection='registeredUsers';
 
 // Create a new MongoClient
 const client = new MongoClient(url);
 
 /**
  * Schema:
- * 
+ *
  * Comment: {
- *  id: string,
+ *  id:string,
  *  text: string,
  *  senderId: string,
  *  timestamp: Datetime,
@@ -22,15 +23,16 @@ const client = new MongoClient(url);
  *  senderName: string,
  *  ownerId: string
  * }
- * 
- */
+ *
+ }
+ **/
 
 // Use connect method to connect to the Server
 function connectDB(fn) {
     client.connect(function(err) {
         const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        fn(collection, db, () => client.close());
+        // const collection = db.collection(collectionName);
+        fn(db, () => client.close());
     });
 }
 
@@ -46,15 +48,15 @@ function connectDB(fn) {
  */
 function insertComment(comment, cb) {
     // const promise = new Promise()
-    connectDB(function(collection, db, closeCon) {
-        collection.insertOne(
+    connectDB(function(db, closeCon) {
+        db.collection(commentCollection).insertOne(
             {
                 ...comment,
                 timestamp: Date.now()
             },
             () => {
                 cb();
-                closeCon()
+                closeCon();
             }
         );
     });
@@ -62,8 +64,8 @@ function insertComment(comment, cb) {
 
 function getComments(metadataId, cb) {
     // const promise = new Promise()
-    connectDB(function(collection, db, closeCon) {
-        const cursor = collection.find({ metadataId });
+    connectDB(function(db, closeCon) {
+        const cursor = db.collection(commentCollection).find({ metadataId });
         const records = [];
         cursor.forEach(function(item) {
             if (item != null) {
@@ -77,7 +79,27 @@ function getComments(metadataId, cb) {
     });
 }
 
+function registerNotification(params, cb){
+     connectDB(function(db, closeCon){
+       console.log('Registration');
+       db.collection(userCollection).updateOne(
+         {user_guid: params.user_guid},
+         params,
+         {
+           upsert: true
+         },
+         () => {
+           console.log('Registration success');
+           cb();
+           closeCon();
+         }
+       );
+     });
+}
+
+
 module.exports = {
     insertComment,
-    getComments
+    getComments,
+    registerNotification
 };

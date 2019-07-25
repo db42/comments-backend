@@ -27,7 +27,9 @@ app.get('/comments', function (req, res) {
 })
 
 const comments = [{ 'object_id': '41004', 'text': 'hello world', 'sender_guid': 'shreya.raj', 'sender_name': 'Shreya', 'comment_timeStamp': '1:12pm', 'tagged_guids': 'shreya.raj' }];
-const notificationsDict = { 'demo_user_id': 'demo token' };
+const notificationsDict = { 'user_guid': 'device_token' };
+
+
 //Fetch all the comments
 app.get('/comments/:id', function (req, res) {
   console.log(req.params.id);
@@ -36,6 +38,7 @@ app.get('/comments/:id', function (req, res) {
   })
   // res.render('index', {weather: null, error: null});
 })
+
 
 //Post comment
 app.post('/comments', function (req, res) {
@@ -53,13 +56,17 @@ app.post('/comments', function (req, res) {
   });
 })
 
-
 app.post('/register_token', function (req, res) {
-  let user_guid = req.body.user_guid;
-  let device_token = req.body.device_token;
 
-  notificationsDict[user_guid] = device_token;
-  res.sendStatus(200);
+  let notificationParams = {
+    'user_guid': req.body.user_guid,
+    'device_token':req.body.device_token
+  };
+
+  console.log(notificationParams);
+  mongoClient.registerNotification(notificationParams, () => {
+    res.send('success');
+  });
 
 
 
@@ -78,7 +85,9 @@ app.post('/register_token', function (req, res) {
   //     }
   //   }
   // });
-})
+});
+
+
 
 
 function sendTestMessage() {
