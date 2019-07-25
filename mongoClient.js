@@ -6,7 +6,7 @@ const url = 'mongodb://localhost:27017';
 // Database Name
 const dbName = 'objectComments';
 const commentCollection = 'comments';
-const userCollection='registeredUsers';
+const userCollection = 'registeredUsers';
 
 // Create a new MongoClient
 const client = new MongoClient(url);
@@ -28,13 +28,10 @@ const client = new MongoClient(url);
  **/
 
 // Use connect method to connect to the Server
-function connectDB(fn) {
-    client.connect(function(err) {
-        const db = client.db(dbName);
-        // const collection = db.collection(collectionName);
-        fn(db, () => client.close());
-    });
-}
+let db;
+client.connect(function (err) {
+    db = client.db(dbName);
+});
 
 /**
  * comment = {
@@ -47,59 +44,65 @@ function connectDB(fn) {
  * }
  */
 function insertComment(comment, cb) {
-    // const promise = new Promise()
-    connectDB(function(db, closeCon) {
-        db.collection(commentCollection).insertOne(
-            {
-                ...comment,
-                timestamp: Date.now()
-            },
-            () => {
-                cb();
-                closeCon();
-            }
-        );
-    });
+    db.collection(commentCollection).insertOne(
+        {
+            ...comment,
+            timestamp: Date.now()
+        },
+        (err) => {
+            if (err) console.log(err);
+            cb();
+        }
+    );
 }
 
 function getComments(metadataId, cb) {
-    // const promise = new Promise()
-    connectDB(function(db, closeCon) {
-        const cursor = db.collection(commentCollection).find({ metadataId });
-        const records = [];
-        cursor.forEach(function(item) {
-            if (item != null) {
-                records.push(item);
-            }
-        }, function(err) {
-            cb(records);
-            db.close();
-           }
-        );
-    });
+    const cursor = db.collection(commentCollection).find({ metadataId });
+    const records = [];
+    cursor.forEach(function (item) {
+        if (item != null) {
+            records.push(item);
+        }
+    }, function (err) {
+        if (err) console.log(err);
+        cb(records);
+    }
+    );
 }
 
-function registerNotification(params, cb){
-     connectDB(function(db, closeCon){
-       console.log('Registration');
-       db.collection(userCollection).updateOne(
-         {user_guid: params.user_guid},
-         params,
-         {
-           upsert: true
-         },
-         () => {
-           console.log('Registration success');
-           cb();
-           closeCon();
-         }
-       );
-     });
+function registerNotification(params, cb) {
+    db.collection(userCollection).updateOne(
+        { userId: params.userId },
+        params,
+        {
+            upsert: true
+        },
+        (err) => {
+            if (err) console.log(err);
+            console.log('Registration success');
+            cb();
+        }
+    );
+}
+
+function getRegisteredToken(userId, cb) {
+    const cursor = db.collection(userCollection).find({ userId });
+    const records = [];
+    cursor.forEach(function (item) {
+        if (item != null) {
+            records.push(item);
+        }
+    }, function (err) {
+        if (err) console.log(err);
+
+        cb(records[0]);
+    });
 }
 
 
 module.exports = {
     insertComment,
     getComments,
-    registerNotification
+    registerNotification,
+    getRegisteredToken
 };

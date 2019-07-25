@@ -32,7 +32,7 @@ const notificationsDict = { 'user_guid': 'device_token' };
 
 //Fetch all the comments
 app.get('/comments/:id', function (req, res) {
-  console.log(req.params.id);
+    console.log('Fetch API: ', req.params.id);
   mongoClient.getComments(req.params.id, (comments) => {
     res.json(comments);
   })
@@ -48,22 +48,22 @@ app.post('/comments', function (req, res) {
     'text': req.body.text,
     'senderId': req.body.sender_guid,
     'senderName': req.body.sender_name,
-    'taggedIds': req.body.shreya.raj,
+    'taggedIds': req.body.taggedIds,
   };
 
   mongoClient.insertComment(newComment, () => {
     res.send('success');
+    onNewComment(newComment);
   });
 })
 
 app.post('/register_token', function (req, res) {
 
   let notificationParams = {
-    'user_guid': req.body.user_guid,
-    'device_token':req.body.device_token
+    'userId': req.body.user_guid,
+    'deviceToken':req.body.device_token
   };
 
-  console.log(notificationParams);
   mongoClient.registerNotification(notificationParams, () => {
     res.send('success');
   });
@@ -87,14 +87,22 @@ app.post('/register_token', function (req, res) {
   // });
 });
 
+function onNewComment(newComment) {
+    // mongoClient.getRegisteredToken(newComment.ownerId, (token) => {
+    //     if (token) {
+            // sendMessage(newComment.text, token.deviceToken);
+    //     }
+    // });
+    const token = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n"
+    sendMessage(newComment.text, token);
+}
 
 
-
-function sendTestMessage() {
+function sendMessage(body, deviceToken) {
   var payload = {
     notification: {
-      title: "This is a Notification",
-      body: "This is the body of the notification message."
+      title: "New Comments",
+      body: (body || '').replace(/<.*?>|<\/.*?>/g, '')
     }
   };
 
@@ -103,7 +111,7 @@ function sendTestMessage() {
     timeToLive: 60 * 60 * 24
   };
 
-  const deviceToken = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n";
+//   const deviceToken = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n";
 
   admin.messaging().sendToDevice(deviceToken, payload, options)
     .then(function (response) {
