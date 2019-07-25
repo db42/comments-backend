@@ -117,6 +117,7 @@ function sendMessage(body, objectId, deviceToken) {
   var payload = {
     notification: {
       title: "New Comments",
+      subtitle:"Subtitle notification"
       body: (body || '').replace(/<.*?>|<\/.*?>/g, '')
     },
     data: {
