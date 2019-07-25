@@ -51,8 +51,8 @@ app.post('/comments', function (req, res) {
     'taggedIds': req.body.taggedIds,
   };
 
-  mongoClient.insertComment(newComment, () => {
-    res.send('success');
+  mongoClient.insertComment(newComment, (data) => {
+    res.send(data);
     onNewComment(newComment);
   });
 })
@@ -87,6 +87,21 @@ app.post('/register_token', function (req, res) {
   // });
 });
 
+app.get('/sendNotif', function(req, res) {
+    const data = {
+        "_id": "5d397a9fc34fdc3a7e86dc7a",
+        "metadataId": "f90529ee-e3b2-4a2a-8227-c2dc8809d587",
+        "ownerId": "bfa70956-50f0-413f-beba-5a68eaca0d5c",
+        "text": "<span class='bk-anomaly-value-more'>2,203%</span> Higher <span class='bk-anomaly-measure'>Unique count User GUID</span> of <span class='bk-anomaly-new-attribute'>walmart</span> for <span class='bk-anomaly-filters'>Week of 07/08/2019(Mixpanel Time)</span> compared to average",
+        "senderId": "0",
+        "senderName": "SpotIQ Bot",
+        "taggedIds": "",
+        "timestamp": 1564048031303
+    };
+    onNewComment(data);
+    res.sendStatus(200);
+});
+
 function onNewComment(newComment) {
     // mongoClient.getRegisteredToken(newComment.ownerId, (token) => {
     //     if (token) {
@@ -94,15 +109,18 @@ function onNewComment(newComment) {
     //     }
     // });
     const token = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n"
-    sendMessage(newComment.text, token);
+    sendMessage(newComment.text, newComment.metadataId, token);
 }
 
 
-function sendMessage(body, deviceToken) {
+function sendMessage(body, objectId, deviceToken) {
   var payload = {
     notification: {
       title: "New Comments",
       body: (body || '').replace(/<.*?>|<\/.*?>/g, '')
+    },
+    data: {
+        objectId
     }
   };
 

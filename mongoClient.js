@@ -49,9 +49,9 @@ function insertComment(comment, cb) {
             ...comment,
             timestamp: Date.now()
         },
-        (err) => {
+        (err, result) => {
             if (err) console.log(err);
-            cb();
+            cb(result.ops[0]);
         }
     );
 }
