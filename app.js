@@ -109,18 +109,20 @@ function onNewComment(newComment) {
     //     }
     // });
     const token = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n"
-    sendMessage(newComment.text, newComment.metadataId, token);
+    sendMessage(newComment, token);
 }
 
 
-function sendMessage(body, objectId, deviceToken) {
+function sendMessage(comment, deviceToken) {
   var payload = {
     notification: {
-      title: "New insight from Thoughtspot",
-      body: (body || '').replace(/<.*?>|<\/.*?>/g, '')
+      title: comment.senderId === '0' ?
+        "New SPOTIQ insight for you!" :
+        `${comment.senderName} mentioned you in a comment`,
+      body: (comment.text || '').replace(/<.*?>|<\/.*?>/g, '')
     },
     data: {
-        objectId
+        objectId: comment.metadataId
     }
   };
 
