@@ -95,32 +95,53 @@ app.get('/sendNotif', function(req, res) {
         "text": "<span class='bk-anomaly-value-more'>2,203%</span> Higher <span class='bk-anomaly-measure'>Unique count User GUID</span> of <span class='bk-anomaly-new-attribute'>walmart</span> for <span class='bk-anomaly-filters'>Week of 07/08/2019(Mixpanel Time)</span> compared to average",
         "senderId": "0",
         "senderName": "SpotIQ Bot",
-        "taggedIds": "",
+        "taggedIds": [],
         "timestamp": 1564048031303
     };
-    onNewComment(data);
+    const data2 = {
+        "_id": "5d397a9fc34fdc3a7e86dc7a",
+        "metadataId": "f90529ee-e3b2-4a2a-8227-c2dc8809d587",
+        "ownerId": "bfa70956-50f0-413f-beba-5a68eaca0d5c",
+        "text": "@vikas you should check this.",
+        "senderId": "1326",
+        "senderName": "Shreya",
+        "taggedIds": [],
+        "timestamp": 1564048031303
+    };
+    onNewComment(data2);
     res.sendStatus(200);
 });
 
 function onNewComment(newComment) {
     // mongoClient.getRegisteredToken(newComment.ownerId, (token) => {
     //     if (token) {
-            // sendMessage(newComment.text, token.deviceToken);
+            // sendMessage(newComment, token.deviceToken);
     //     }
     // });
+    // (newComment.taggedIds || []).forEach(taggedId => {
+    //     mongoClient.getRegisteredToken(taggedId, (token) => {
+    //         if (token) {
+    //             sendMessage(newComment, token.deviceToken, true);
+    //         }
+    //     });
+    // })
     const token = "dvf6DTBNQl4:APA91bE7QlrEJ6y3Q3lrkGhy2LWL8EmE_WCnSkzdARgSCxeFsqGAYtgsc2UoK1IJlLFliOADk7Jtb-wYDSgqTJPNBR1HR2-JLmAi6LnH1NxSKF4VMRtffrzU4siABMnmLvBIkracrb1n"
     sendMessage(newComment, token);
 }
 
 
-function sendMessage(comment, deviceToken) {
+function sendMessage(comment, deviceToken, thoughTag) {
   var payload = {
     notification: {
       title: comment.senderId === '0' ?
         "New SPOTIQ insight for you!" :
-        `${comment.senderName} mentioned you in a comment`,
-      body: (comment.text || '').replace(/<.*?>|<\/.*?>/g, '')
+        thoughTag ?
+          `${comment.senderName} mentioned you in a comment` :
+          `${comment.senderName} has commented on your Pinboard`,
+      body: (comment.text || '').replace(/<.*?>|<\/.*?>/g, ''),
+      sound: "default"
     },
+
     data: {
         objectId: comment.metadataId
     }
