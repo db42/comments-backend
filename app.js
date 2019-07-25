@@ -116,8 +116,7 @@ function onNewComment(newComment) {
 function sendMessage(body, objectId, deviceToken) {
   var payload = {
     notification: {
-      title: "New Comments",
-      subtitle:"Subtitle notification"
+      title: "New insight from Thoughtspot",
       body: (body || '').replace(/<.*?>|<\/.*?>/g, '')
     },
     data: {
